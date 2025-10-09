@@ -22,8 +22,4 @@ require("lazy").setup({
     spec = {
         { import = "thevecneccy.plugins" },
     },
-    checker = {
-        enabled = true,
-        notify = false,
-    },
 })
