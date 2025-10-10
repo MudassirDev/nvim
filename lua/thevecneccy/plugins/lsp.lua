@@ -1,18 +1,24 @@
 return {
     {
         "neovim/nvim-lspconfig",
+        dependencies = {
+            'saghen/blink.cmp',
+        },
         config = function()
+            local capabilites =  require('blink.cmp').get_lsp_capabilities()
             -- configure all the servers here
             vim.lsp.config['luals'] = {
                 cmd = { 'lua-language-server' },
                 filetypes = { 'lua' },
                 root_markers = { { '.luarc.json', '.luarc.jsonc' }, '.git' },
+                capabilites = capabilites,
             }
             vim.lsp.enable('luals')
             vim.lsp.config['gopls'] = {
                 cmd = { 'gopls' },
                 filetypes = { 'go' },
                 root_markers = { { 'go.mod' }, '.git' },
+                capabilites = capabilites,
             }
             vim.lsp.enable('gopls')
 
