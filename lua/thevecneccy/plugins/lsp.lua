@@ -1,43 +1,64 @@
 return {
     {
         "neovim/nvim-lspconfig",
+        event = { "BufReadPre", "BufNewFile" },
         dependencies = {
-            'saghen/blink.cmp',
+            "mason-org/mason.nvim",
+            "mason-org/mason-lspconfig.nvim",
         },
         config = function()
-            local capabilites =  require('blink.cmp').get_lsp_capabilities()
-            -- configure all the servers here
-            vim.lsp.config['luals'] = {
-                cmd = { 'lua-language-server' },
-                filetypes = { 'lua' },
-                root_markers = { { '.luarc.json', '.luarc.jsonc' }, '.git' },
-                capabilites = capabilites,
-            }
-            vim.lsp.enable('luals')
-            vim.lsp.config['gopls'] = {
-                cmd = { 'gopls' },
-                filetypes = { 'go' },
-                root_markers = { { 'go.mod' }, '.git' },
-                capabilites = capabilites,
-            }
-            vim.lsp.enable('gopls')
+            require("mason").setup()
+            require("mason-lspconfig").setup({
+                ensure_installed = {
+                    "lua_ls",
+                    "gopls",
+                },
+                automatic_installation = true,
+            })
 
-            -- some keybindings to help me go kaboom
-            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { noremap = true, silent = true })
-            vim.keymap.set('n', 'K', vim.lsp.buf.hover, { noremap = true, silent = true })
+            local capabilities = vim.lsp.protocol.make_client_capabilities()
+            -- OPTIONAL: nvim-cmp or other plugins can enhance this
+            -- capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-            -- to see errors
-            vim.keymap.set('n', '<leader>k', function()
-                vim.diagnostic.open_float({ scope = 'line' })
-            end, { noremap = true, silent = true })
+            local on_attach = function(_, bufnr)
+                local opts = { buffer = bufnr }
+                vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+                vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+                vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+                vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+                vim.keymap.set("n", "<leader>k", function()
+                    vim.diagnostic.open_float()
+                end,opts)
+            end
 
-            -- to navigate errors
-            vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { noremap = true, silent = true, buffer = bufnr })
-            vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { noremap = true, silent = true, buffer = bufnr })
+            -- Minimal LSP configs
+            vim.lsp.config("lua_ls", {
+                on_attach = on_attach,
+                capabilities = capabilities,
+                settings = {
+                    Lua = {
+                        workspace = { checkThirdParty = false },
+                        diagnostics = { globals = { "vim" } },
+                    },
+                },
+            })
+
+            vim.lsp.config("gopls", {
+                on_attach = on_attach,
+                capabilities = capabilities,
+            })
+
+            vim.lsp.config("tsserver", {
+                on_attach = on_attach,
+                capabilities = capabilities,
+                filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
+                root_markers = { "package.json", "tsconfig.json", ".git" },
+            })
+
+            -- Enable them all
+            vim.lsp.enable("lua_ls")
+            vim.lsp.enable("gopls")
+            vim.lsp.enable("tsserver")
         end,
     },
-    {
-        "mason-org/mason.nvim",
-        opts = {}
-    }
 }
