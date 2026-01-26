@@ -49,6 +49,11 @@ return {
                 capabilities = capabilities,
             })
 
+            vim.lsp.config("clangd", {
+                on_attach = on_attach,
+                capabilities = capabilities,
+            })
+
             vim.lsp.config("tsserver", {
                 on_attach = on_attach,
                 capabilities = capabilities,
