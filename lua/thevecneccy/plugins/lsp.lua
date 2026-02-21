@@ -22,6 +22,8 @@ return {
                 vim.keymap.set("n", "<leader>k", function()
                     vim.diagnostic.open_float()
                 end,opts)
+
+                vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
             end
 
             -- Minimal LSP configs
