@@ -47,8 +47,10 @@ return {
             })
 
             vim.lsp.config("python-lsp-server", {
+                cmd = { "pylsp" },
                 on_attach = on_attach,
                 capabilities = capabilities,
+                filetypes = { "python" },
             })
 
             vim.lsp.config("typescript-language-server", {
